@@ -1,0 +1,125 @@
+#!/usr/bin/env bash
+#
+# My Academic Paper Search (MAPS) project
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+#
+# Maintain or bootstrap the PDF papers database metadata
+#
+# April 24nd, 2019 - Michele Giugliano, mgiugliano@gmail.com
+#
+
+# Set the full path to the PDF database root...
+ROOT_PDF_FOLDER=/Users/michi/papers
+#ROOT_PDF_FOLDER=/Users/michi/Downloads/Export_Paper3
+
+# Set the full path to the metadata subfolders...
+TEXTSUB=$ROOT_PDF_FOLDER/.text
+SEARCHDIR=$TEXTSUB/x
+
+# Let's store aside the current working directory...
+CWD=$(pwd)
+
+# String to be displayed as a "progress indicator"
+sp='/-\|'
+
+
+# Let's now change dir into the proper metadata subfolder
+command cd $ROOT_PDF_FOLDER            # Change directory to the main PDF folder
+echo ""
+echo ""
+echo "MAPS v. 0.1 - (c) Michele Giugliano, April 2019"
+echo ""
+echo ">>> Database root is $ROOT_PDF_FOLDER"
+echo ""
+
+echo ">>> Step 1: creating/checking for (sub)folder structure..."
+command mkdir  -pv $SEARCHDIR
+echo ">>> Done!"
+
+#-------------------------------------------------------------------------------------------------------------------------
+echo ">>> Step 2: replacing blanks from PDF filenames..."
+printf ' '
+
+# By the "find -depth" command, I search for *.pdf files in the root folder
+# as well as, recursively, in any of its subfolders
+
+IFS=$'\n'; set -f # IFS (internal field seperator) temporarily set to the newline character
+				  # (otherwise the recursive find below won't work with spaces in filanames)
+
+#for file in ./*.pdf        # This does NOT work recursively, descending the subfolders!
+for file in $(find . -depth -name '*.pdf')
+do
+	case $file in 	# I check for 'spaces', to speed up execution
+	     *\ * )
+			 #echo "$file contains spaces!!!"
+    		 command mv "$file" "${file// /_}";
+	          ;;
+	       *)
+	         #echo "$file does NOT contain spaces."
+	           ;;
+	esac
+
+	# "progress indicator"
+    printf '\b%.1s' "$sp"
+	sp=${sp#?}${sp%???}
+done
+unset IFS; set +f # IFS set back to default
+
+printf ' '
+echo ">>> Done!"
+
+#---------------------------------------------
+
+echo ">>> Step 3: Creating metadata..."
+printf ' '
+
+IFS=$'\n'; set -f # IFS (internal field seperator) temporarily set to the newline character
+				  # (otherwise the recursive find below won't work with spaces in filanames)
+
+mycount=0
+
+#for file in ./*.pdf        # This does NOT work recursively, descending the subfolders!
+for file in $(find . -depth -name '*.pdf')
+do
+        textfile=$(basename "$file" .pdf).txt      # name of the (text) file, generated removing .pdf and adding .txt
+
+		if [ ! -f $TEXTSUB/$textfile ]; then
+			let "mycount++"
+			#echo "    Metadata for $file not found in the database: creating..."
+			# pdftotext myfile.pdf --> creates myfile.txt as output
+        	pdftotext -f 1 -l 2 $file $TEXTSUB/$textfile 2>/dev/null
+			# pdftotext has been invoked, starting from (first) page 1 and finishing
+			# at (last) page 2, standard error is redirected to NULL
+
+			wordcount=$(wc -w $TEXTSUB/$textfile | awk '{print $1}')
+			if [ "$wordcount" == "0" ]; then 		# pdftotext could NOT create a valid text file
+				echo "    WARNING: $file could not be parsed as text!"
+				echo $textfile > $TEXTSUB/$textfile  	# so I create it and populate it with the filename itself
+			fi
+
+        	tr -d "\n\r" < $TEXTSUB/$textfile >$SEARCHDIR/$(basename "$file" .pdf)
+			# Remove \n and \r from the text file and generate an additional output
+			# file (without suffix) inside the .text/x subfolder, for multiline searching
+
+			#command mv $textfile $TEXTSUB/ 		# the text file is stored in .text (for file preview)
+		fi
+
+		# "progress indicator"
+        printf '\b%.1s' "$sp"
+		sp=${sp#?}${sp%???}
+done
+unset IFS; set +f # IFS set back to default
+
+printf ' '
+echo ">>> Done!"
+
+echo "Added $mycount entries to the database!"
+echo "In total, there are $(find . -depth -name '*.pdf' | wc -l) entries searchable." #------------------------------------------------------------------------------------------------------------------------t-
+
+# The previous working directory is restored...
+command cd $CWD
+
+
+
+
+
