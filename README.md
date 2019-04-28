@@ -27,9 +27,9 @@ locate the corresponding PDF file and perform on it elementary operations such a
 ## Install
 1. Add to your .bash_profile (or .bashrc) the shell environment variable
 
-# My Academic Paper Search (MAPS)
+'''# My Academic Paper Search (MAPS)
 # Set the full path to the PDF database root...
-export ROOT_PDF_FOLDER=~/Dropbox/papers
+export ROOT_PDF_FOLDER=~/Dropbox/papers'''
 
 Such a variable must contain the full path to the (root) folder where your PDF
 library resides (even when organised into subfolders). Mine is "in the cloud"
@@ -40,14 +40,13 @@ convenient backup of the precious files.
  		maps-delete.sh
  		maps-maintain.sh
  		maps-search.sh
- 		maps-unreadable.sh
 
 or simply copy them into a local folder (e.g. ~/maps-academic/).
 
 3. Set an alias as the one indicated below:
-alias s='~/maps-academic/maps-search.sh'
+'''alias s="~/maps-academic/maps-search.sh"'''
 
-This work is largely inspired from https://github.com/bellecp/fast-p
+This work is largely inspired from and based on https://github.com/bellecp/fast-p
 As an exercise in bash-fu, I have tried to imitate fast-p by myself.
 
 
