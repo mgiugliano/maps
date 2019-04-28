@@ -27,9 +27,7 @@ locate the corresponding PDF file and perform on it elementary operations such a
 ## Install
 1. Add to your .bash_profile (or .bashrc) the shell environment variable
 
-'''# My Academic Paper Search (MAPS)
-# Set the full path to the PDF database root...
-export ROOT_PDF_FOLDER=~/Dropbox/papers'''
+'''export ROOT_PDF_FOLDER=~/Dropbox/papers'''
 
 Such a variable must contain the full path to the (root) folder where your PDF
 library resides (even when organised into subfolders). Mine is "in the cloud"
