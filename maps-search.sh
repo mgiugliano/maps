@@ -18,8 +18,10 @@ REVEAL="open -R"
 #EDITCMD="open -a /Applications/Preview.app/Contents/MacOS/Preview"
 #EDITCMD="open -a /Applications/Skim.app/Contents/MacOS/Skim"
 
+ver="MAPS v. 0.1 - (c) Michele Giugliano, April 2019"
+
 echo ""
-echo "MAPS v. 0.1 - (c) Michele Giugliano, April 2019"
+echo $ver
 echo "Fuzzy Search"
 echo ""
 echo ">>> Database root is $ROOT_PDF_FOLDER"
@@ -48,7 +50,7 @@ command cd $SEARCHDIR # Change directory to the metadata subfolder
 
 #entry=$(rg --no-line-number --no-messages -j0 -p --block-buffered --color=never --with-filename --no-heading . | fzf -e -i --select-1 --exit-0 --expect=ctrl-o,ctrl-e,ctrl-j --color=bg+:24 --delimiter=: -1 --nth=2.. --sync --algo=v2 --extended --reverse --preview="tput bold; echo {1}; tput sgr0; echo; cat $TEXTSUB/{1}.txt" --preview-window=right:70% | awk -F: '{print $1}' | cut -d'.' -f1)
 
-entry=$(rg --no-line-number --no-messages -j0 -p --block-buffered --color=never --with-filename --no-heading . | fzf -e -i --select-1 --exit-0 --expect=ctrl-o,ctrl-e,ctrl-j --margin 2% --color=bg+:24 --delimiter=: -1 --nth=2.. --sync --algo=v2 --extended --reverse --preview='tput bold; echo {1}; tput sgr0; echo; v=$(echo {q} | tr " " "|"); cat ../{1}.txt 2>/dev/null | ggrep -E "^|$v" -i --color=always' --preview-window=top:80%:wrap | awk -F: '{print $1}' | cut -d'.' -f1)
+entry=$(rg --no-line-number --no-messages -j0 -p --block-buffered --color=never --with-filename --no-heading . | fzf -e -i --select-1 --exit-0 --expect=ctrl-o,ctrl-e,ctrl-j --header="$ver" --margin 2% --color=bg+:24 --delimiter=: -1 --nth=2.. --sync --algo=v2 --extended --reverse --preview='tput bold; echo {1}; tput sgr0; echo; v=$(echo {q} | tr " " "|"); cat ../{1}.txt 2>/dev/null | ggrep -E "^|$v" -i --color=always' --preview-window=top:80%:wrap | awk -F: '{print $1}' | cut -d'.' -f1)
 
 key=$(head -1 <<< "$entry")               # this may be empty or may be ctrl-j/o/e
 file=$(head -2 <<< "$entry" | tail -1)    # this contains the file

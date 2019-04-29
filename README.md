@@ -38,6 +38,7 @@ convenient backup of the precious files.
  		maps-delete.sh
  		maps-maintain.sh
  		maps-search.sh
+(and make them all executables, by chmod +x *.sh)
 
 or simply copy them into a local folder (e.g. ~/maps-academic/).
 
@@ -46,5 +47,39 @@ or simply copy them into a local folder (e.g. ~/maps-academic/).
 
 This work is largely inspired from and based on https://github.com/bellecp/fast-p
 As an exercise in bash-fu, I have tried to imitate fast-p by myself.
+
+## Use
+
+Invoke (by the alias or directly) the maps-search.sh script.
+
+## Motivations and Engineering
+
+I have been a faithful user of Paper (until version 3), under macOs. That is a GUI app for managing a large number of academic PDF papers.
+
+Entries could be nicely synchronized with PubMed, so that title, author names, volume and pages and other meta data became  automatically associated to each PDF and could be used to guide searches through the database and identify files. There were tons of additional functions, integration with bibliography managers, exporters, management of annotations, etc. I never really used.
+
+Over the years, I grew particularly uncomfortable with  Papers: it often crashed, was very slow to fire up, and most importantly it compromised my actual files several times, resulting in missing files or orphan database entries.
+
+I then considered the possibility of simplifying to the bare bones the functionality of a similar software, tailoring it to my use cases only, and I came out with a command line version of an elementary PDF manager I called MAPS - My Archive PDF Search Tool.
+
+It does NOT have any built in PDF viewer, assuming the use of Preview (macOs default reader). It also does not have any synchronization or backup feature, assuming the implicit use of Dropbox or of another equivalent cloud service.
+
+It does just one very basic task that I found myself doing over and over: fuzzy search and quickly retrieve the desired pdf.
+
+Specifically,
+- it expects a root folder full of unsorted PDF (including any subfolders containing PDF);
+- It automatically creates (once for all or whenever a new file is added to the collection) textual metadata for each file;
+- It allows a quick fuzzy text search of the corresponding pdf on the basis of the text contained in the first two pages of the PDF, or alternatively contained in the filename for those files that could not be text-parsed;
+
+It is currently composed of two bash scripts. The first maintains the database, while the second implements the fuzzy search.
+
+In a nutshell, the maintenance script first replace spaces in the file name of the PDF fikes (recursively visiting any subfolder of the "root" directory). Then, it calls pdftotext to obtain a textual snapshot of each pdf and stores each file in a hidden folder.
+Using ripgrep (a grep replacement), in combination with fzf, allows later the fuzzy search on the text contained in every text file created during the first snapshot phase.
+Thanks to fzf preview functionality, a textual preview of the found pdf file is presented to the user live, during the search.
+
+In reality, the snapshot is performed twice, with the second one removing any new line character and allowing the search to occur behind the scene (and without affecting the preview) over multiple lines too.
+
+It would be nice to have it all integrated with bibtex. One way would be to add the bibtex cite key in the filename of the file.
+
 
 
